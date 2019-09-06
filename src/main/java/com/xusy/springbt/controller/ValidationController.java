@@ -1,6 +1,8 @@
 package com.xusy.springbt.controller;
 
+import com.xusy.springbt.base.BaseController;
 import com.xusy.springbt.dto.Product;
+import com.xusy.springbt.result.Result;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,15 +23,15 @@ import javax.validation.constraints.Min;
  **/
 @RestController
 @Validated
-public class ValidationController {
+public class ValidationController extends BaseController {
     @GetMapping("/valid/test/{id}")
-    public ResponseEntity<String> handleTest(@PathVariable("id") @Max(10) int id,
+    public ResponseEntity<Result> handleTest(@PathVariable("id") @Max(10) int id,
                                              @RequestParam("count") @Min(5) int count) {
-        return ResponseEntity.ok("validation is done");
+        return ok(Result.success("validation is done"));
     }
 
     @PostMapping("/test")
-    public ResponseEntity<String> validateJsonBean(@Valid @RequestBody Product product) {
-        return ResponseEntity.ok("valid id done");
+    public ResponseEntity<Result> validateJsonBean(@Valid @RequestBody Product product) {
+        return ok(Result.success("validation is done"));
     }
 }
