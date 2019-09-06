@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://dev.mysql.ywsoftware.cn:3306/numysql_hgyl
+    username: numysql_hgyl
+    password: numysql_hgyl
+server:
+  port: 8082
+
+
+
