@@ -1,5 +1,6 @@
 package com.xusy.springbt.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.experimental.Accessors;
  **/
 @Data
 @Accessors(chain = true)//支持链式构建
+@JsonInclude(JsonInclude.Include.NON_NULL)//去除null的字段转换json
 public class GoodsModel {
     /**
      * id

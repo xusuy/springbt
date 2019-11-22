@@ -18,7 +18,7 @@ public class HelloController {
     @GetMapping(value = "/result")
     public Result result() {
         GoodsModel goodsModel = new GoodsModel();
-        goodsModel.setGoodsId(1l).setGoodsName("原子弹").setGoodsPrice(100000.00).setStock(1);
+        goodsModel.setGoodsId(1l).setGoodsPrice(100000.00).setStock(1);
         return Result.success(goodsModel);
     }
 
