@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,12 +44,12 @@ public class ExtensionServiceImpl implements ExtensionService {
         //理赔信息采集表
         if ("1".equals(infoTypeObj)) {
             buildCalimInfoGather(extensionMap, insuranceMap);
-            fileName = "立案信息采集表.doc";
+            fileName = "立案信息采集表";
             ftlName = "reportInfoGather.ftl";
         } else if ("2".equals(infoTypeObj)) {
             //立案审核建议书
             buildRegisterAuditProposal(extensionMap, insuranceMap);
-            fileName = "审核建议书.doc";
+            fileName = "审核建议书";
             ftlName = "auditProposal.ftl";
         }
 
@@ -57,14 +58,24 @@ public class ExtensionServiceImpl implements ExtensionService {
         configuration.setClassForTemplateLoading(this.getClass(), "/templates");
         Template template;
         template = configuration.getTemplate(ftlName, "utf-8");
-        Resource classPathResource = new ClassPathResource("templates/tem/" + fileName);
-        @Cleanup InputStream inputStream = classPathResource.getInputStream();
-        File outFile = classPathResource.getFile();
+//        Resource classPathResource = new ClassPathResource("templates/tem/" + fileName);
+//        @Cleanup InputStream inputStream = classPathResource.getInputStream();
+//        File outFile = classPathResource.getFile();
 //        File outFile = ResourceUtils.getFile("classpath:templates/tem/" + fileName);
-        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"));
+//        URL url = this.getClass().getResource("/templates/tem/" + fileName);
+//        File outFile = new File(url.getPath());
+
+        //如果输出目标文件夹不存在，则创建
+//        if (!outFile.getParentFile().exists()) {
+//            outFile.getParentFile().mkdirs();
+//        }
+        //以上方法都不能读取jar中的文件，不能生成file
+        //生成临时目标文件
+        File tempFile = File.createTempFile(fileName, ".doc");
+        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "utf-8"));
         template.process(extensionMap, writer);
         //下载文件
-        FileUtil.downLoadFile(fileName, inputStream, response);
+        FileUtil.downLoadFile(fileName + ".doc", tempFile, response);
         writer.close();
     }
 
