@@ -1,0 +1,125 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      master:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_developer?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      base:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_base?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      authtest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_auth?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      processtest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_process?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      formtest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_form?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      reporttest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_report?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      datatest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_data?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      mobiletest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_mobile?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      sharedtest:
+        url: jdbc:mysql://${redcat.db-test.url}/rc_${rc.profile}_test_shared?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db-test.username}
+        password: ${redcat.db-test.password}
+      authprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_auth?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      processprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_process?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      formprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_form?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      reportprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_report?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      dataprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_data?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      mobileprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_mobile?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      sharedprod:
+        url: jdbc:mysql://${redcat.db.url}/rc_${rc.profile}_sys_shared?characterEncoding=utf8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&&useOldAliasMetadataBehavior=true
+        username: ${redcat.db.username}
+        password: ${redcat.db.password}
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      #validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: false
+        url-pattern: /druid/*
+        #login-username: admin
+        #login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 100MB
+      max-file-size: 50MB
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+redcat:
+  db-test:
+    url: ${redcat.db.url}
+    username: ${redcat.db.username}
+    password: ${redcat.db.password}
+
+# Tomcat
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1000
+    min-spare-threads: 30
+  port: 9005
+  connection-timeout: 5000ms
+  servlet:
+    context-path: /springbt-service
+
+
+

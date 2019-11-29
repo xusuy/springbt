@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @author CSDN
  * @create 2018-12-12 15:25
  * @desc 原文：https://blog.csdn.net/yal23333/article/details/79695546
+ * druid监控平台：http://localhost:8081/druid/sql.html
  **/
 @Configuration
 public class DruidConfiguration {
