@@ -40,7 +40,7 @@ public class ExtensionController {
                                                 HttpServletRequest request) throws IOException, TemplateException {
         //便于测试,创建测试map
         Map<String, Object> insuranceMap = new HashMap<>();
-        insuranceMap.put("infoType", "1");
+        insuranceMap.put("infoType", "2");
         extensionService.downLoadInsuranceMemberInfoWord(insuranceMap, response, request);
     }
 }
