@@ -12,7 +12,8 @@ import java.util.Map;
 
 /**
  * 动态数据源配置中心：通过@DataSource注释+spring aop动态配置数据源
- * 需要配置时：打开@Configuration注释，参照dataResourcesApplication.yml内容配置对应数据源
+ * 需要配置时：打开@Configuration注释，参照dataResourcesApplication.yml内容配置多数据源
+ * 只需在service中使用@DataSource注释并且指定数据源name(DataSourceNames中)即可
  *
  * @Date: 2019/1/8 11:25
  */
