@@ -37,6 +37,7 @@ public class ExtensionServiceImpl implements ExtensionService {
     @Override
     public void downLoadInsuranceMemberInfoWord(Map<String, Object> insuranceMap, HttpServletResponse response,
                                                 HttpServletRequest request) throws IOException, TemplateException {
+        //ftl模板文件(用wps生成)：office和wps的单选框等不兼容，wps的各版本单选框样式也不兼容。
         Map<String, Object> extensionMap = new HashMap<>();
         String fileName = "";
         String ftlName = "";
@@ -50,7 +51,7 @@ public class ExtensionServiceImpl implements ExtensionService {
             //立案审核建议书
             buildRegisterAuditProposal(extensionMap, insuranceMap);
             fileName = "审核建议书";
-            ftlName = "auditProposal.ftl";
+            ftlName = "auditProposal-2.ftl";
         }
 
         Configuration configuration = new Configuration(new Version("2.3.0"));
