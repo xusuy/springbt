@@ -3,8 +3,6 @@ package com.xusy.springbt.controller;
 import com.xusy.springbt.service.ExtensionService;
 import freemarker.template.TemplateException;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

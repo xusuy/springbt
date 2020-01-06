@@ -13,6 +13,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>springbt</name>
     <description>springbt project for Spring Boot</description>
+    <!--打包成war包-->
+    <!--<packaging>war</packaging>-->
 
     <properties>
         <java.version>1.8</java.version>
@@ -23,6 +25,23 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 排除内置tomcat容器，导出成war包可以让外部容器运行spring-boot项目-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-web</artifactId>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.springframework.boot</groupId>-->
+                    <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
