@@ -61,7 +61,7 @@ public class BtConfig {
 
     @Bean
     @Primary
-    @Qualifier("xml")
+    @Qualifier("xmlMapper")
     public XmlMapper xmlMapper(Jackson2ObjectMapperBuilder builder) {
         XmlMapper mapper = builder.createXmlMapper(true)
                 .build();
@@ -72,7 +72,7 @@ public class BtConfig {
     }
 
     @Bean
-    @Qualifier("json")
+    @Qualifier("jsonMapper")
     public ObjectMapper jsonMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper mapper = builder.createXmlMapper(false)
                 .build();
