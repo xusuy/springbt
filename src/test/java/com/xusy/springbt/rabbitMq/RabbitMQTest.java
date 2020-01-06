@@ -11,6 +11,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.*;
 
+/**
+ * 如果报403没有权限访问的错误，请到rabbitMq management为用户添加交换机权限：
+ * Set permissions——>Topic permissions
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class RabbitMQTest {
