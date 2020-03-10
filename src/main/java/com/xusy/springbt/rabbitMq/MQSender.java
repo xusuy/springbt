@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * @author xsy
  * @desc 消费发送端
  **/
-@Service
+//@Service
 public class MQSender {
     private static Logger log = LoggerFactory.getLogger(MQSender.class);
 

@@ -30,12 +30,12 @@ spring:
     view:
       prefix: /webapp/web-static/html
       suffix: .html
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: test
-    password: test
-    virtual-host: /
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: test
+#    password: test
+#    virtual-host: /
 server:
   port: 8080
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xusy.springbt.mapper.InsuranceManageMapper">
+    <insert id="insertInfoInsuranceChecke">
+        insert into `monthly_data_verification_form`
+        (
+        `id`,
+        `institution_name`,
+        `category`,
+        `tsing_lung_owner_id`,
+        `merchant_name`,
+        `merchant_type`,
+        `merchant_main_industry`,
+        `waybill_number`,
+        `collecting_time`,
+        `size`,
+        `quantity`,
+        `originating_city`,
+        `destination_city`,
+        `declared_value`,
+        `premium`,
+        `extra`,
+        `signing_agency`,
+        `special_fresh_delivery`,
+        `consignment_contents`,
+        `importer`,
+        `import_time`,
+        `CreatedUser`
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            uuid(),
+            #{item.jigoumingchen},
+            #{type},
+            #{item.qinglongyezhuid},
+            #{item.shangjiamingchen},
+            #{item.shangjialeixing},
+            #{item.shangjiazhuyingleixing},
+            #{item.yundanhao},
+            #{item.lanshoushijian},
+            #{item.chichun},
+            #{item.shuliang},
+            #{item.shifachengshi},
+            #{item.mudichengshi},
+            #{item.shengmingjiazhi},
+            #{item.baofei},
+            #{item.baoxainewaifei},
+            #{item.qianyuejigou},
+            #{item.shengxianzhuansong},
+            #{item.tuojineirong},
+            #{userId},
+            now(),
+            #{userId}
+            )
+        </foreach>
+    </insert>
+</mapper>

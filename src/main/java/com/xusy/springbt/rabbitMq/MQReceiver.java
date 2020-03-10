@@ -15,7 +15,7 @@ import java.io.IOException;
  * @create 2020-01-06 15:28
  * @desc 消息接收端
  **/
-@Service
+//@Service
 public class MQReceiver {
     @Autowired
     @Qualifier("jsonMapper")

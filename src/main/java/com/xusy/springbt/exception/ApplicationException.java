@@ -7,13 +7,21 @@ import com.xusy.springbt.enums.ResultEnum;
  * Created by 廖师兄
  * 2017-01-21 14:05
  */
-public class ApplicationException extends RuntimeException{
+public class ApplicationException extends RuntimeException {
 
     private Integer code;
 
     public ApplicationException(ResultEnum resultEnum) {
         super(resultEnum.getMsg());
         this.code = resultEnum.getCode();
+    }
+
+    public ApplicationException(String msg) {
+        super(msg);
+    }
+
+    public ApplicationException(String msg, Exception e) {
+        super(msg, e);
     }
 
     public Integer getCode() {
