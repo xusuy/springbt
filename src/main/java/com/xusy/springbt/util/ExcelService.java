@@ -52,7 +52,6 @@ public class ExcelService {
         if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
             throw new RuntimeException("上传文件格式不正确");
         }
-        List<T> dataList = new CopyOnWriteArrayList<>();
         List<Map<String, Object>> dataMapList = new CopyOnWriteArrayList<>();
         Workbook workbook = null;
         try {
@@ -132,7 +131,6 @@ public class ExcelService {
                                         }
                                     }
                                     if (!allBlank) {
-                                        dataList.add(t);
                                         dataMapList.add(MapUtils.object2Map(t));
                                     } else {
                                         log.warn(String.format("row:%s is blank ignore!", rowNum));
@@ -164,7 +162,6 @@ public class ExcelService {
                 }
             }
         }
-        data.put("list", dataList);
         data.put("listMap", dataMapList);
         return data;
     }

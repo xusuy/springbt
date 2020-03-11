@@ -29,7 +29,7 @@ public class BigDataTestController {
 
     /**
      * 百万级excel数据导入
-     * 测试：10万条数据2分多；20万条7分9秒。。。
+     * 测试：10万条数据1分35秒；20万条7分9秒。。。，文件超过10m 构建poi Workbook对象时内存溢出
      * @param multipartFile 文件
      * @return
      * @throws Exception
