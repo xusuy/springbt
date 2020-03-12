@@ -52,6 +52,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * 采用poi event事件模型读取百万级excel数据量
+ * 注意：excel单元格中不能有空值，否则影响list中的对应索引值，可以使用null/NULL代替空值，list中会用""代替单元格中的null。可以补充的空单元格list中存null
+ */
 public class ExcelEventParser {
 
     enum xssfDataType {
@@ -170,8 +174,8 @@ public class ExcelEventParser {
                     BlankRecord brec = (BlankRecord) record;
                     thisRow = brec.getRow();
                     thisColumn = brec.getColumn();
-                    thisStr = NULL;
-                    row.add(thisColumn, thisStr);
+//                    thisStr = NULL;
+                    row.add(thisColumn, null);
                     break;
                 // 布尔或错误单元格
                 case BoolErrRecord.sid:
@@ -216,7 +220,7 @@ public class ExcelEventParser {
                     curRow = thisRow = lrec.getRow();
                     thisColumn = lrec.getColumn();
                     value = lrec.getValue().trim();
-                    value = value.equals("") ? NULL : value;
+                    value = value.equals("") ? null : value;
                     this.row.add(thisColumn, value);
                     break;
                 // 共用的文本单元格
@@ -225,10 +229,10 @@ public class ExcelEventParser {
                     curRow = thisRow = lsrec.getRow();
                     thisColumn = lsrec.getColumn();
                     if (sstRecord == null) {
-                        row.add(thisColumn, NULL);
+                        row.add(thisColumn, null);
                     } else {
                         value = sstRecord.getString(lsrec.getSSTIndex()).toString().trim();
-                        value = value.equals("") ? NULL : value;
+                        value = value.equals("") ? null : value;
                         row.add(thisColumn, value);
                     }
                     break;
@@ -239,7 +243,7 @@ public class ExcelEventParser {
                     thisColumn = numrec.getColumn();
                     //处理时间类型的数字
                     value = formatListener.formatNumberDateCell(numrec).trim();
-                    value = value.equals("") ? NULL : value;
+                    value = value.equals("") ? null : value;
                     row.add(thisColumn, value);
                     break;
 
@@ -255,7 +259,7 @@ public class ExcelEventParser {
                 MissingCellDummyRecord mc = (MissingCellDummyRecord) record;
                 curRow = thisRow = mc.getRow();
                 thisColumn = mc.getColumn();
-                row.add(thisColumn, NULL);
+                row.add(thisColumn, null);
             }
 
             if (thisRow > -1)
@@ -269,12 +273,13 @@ public class ExcelEventParser {
                     int len = maxRef - row.size();
                     for (int i = 0; i < len; i++) {
                         lastColumnNumber++;
-                        row.add(lastColumnNumber, NULL);
+                        row.add(lastColumnNumber, null);
                     }
                 }
                 if (curRow == 0) {
                     maxRef = row.size();
                 }
+                //一行处理结束后可以调用定制业务
                 rows.add(row);
                 lastColumnNumber = -1;
                 row = new ArrayList<String>();
@@ -319,6 +324,8 @@ public class ExcelEventParser {
         private int curRow = 0;
         //空单元格使用的填充字符
         private String NULL = "-";
+        //是否是有效行
+        private boolean validRowFlag = false;
 
         /**
          * XLSXReader构造函数
@@ -437,14 +444,14 @@ public class ExcelEventParser {
                         }
                         //填充空单元格
                         for (int i = 0; i < len; i++) {
-                            record.add(curCol, thisStr);
+                            record.add(curCol, null);
                             curCol++;
                             Newcell = ref;
                             rowNull++;
                         }
                     }
                 }
-                //选择合适的方式处理单元格
+                //选择合适的方式处理单元格(null/NULL被当做空值)
                 switch (nextDataType) {
 
                     case BOOL:
@@ -475,6 +482,9 @@ public class ExcelEventParser {
                         } catch (NumberFormatException ex) {
                             System.out.println("未找到对应的SST索引 '" + sstIndex + "': " + ex.toString());
                         }
+                        if ("NULL".equalsIgnoreCase(thisStr)) {
+                            thisStr = "";
+                        }
                         break;
 
                     case NUMBER:
@@ -496,30 +506,31 @@ public class ExcelEventParser {
                         thisStr = "(尚未支持的类型: " + nextDataType + ")";
                         break;
                 }
-                if (thisStr == null || thisStr.equals(NULL)) {
-                    isCellNull = true;
-                }
                 //这里可以根据实际业务进行改造，以单元格为单位处理
                 record.add(curCol, thisStr);
                 curCol++;
+                if (thisStr != null || !"".equals(thisStr)) {
+//                    isCellNull = true;
+                    ////如果里面某个单元格含有值，则标识该行是有效行
+                    validRowFlag = true;
+                }
             } else if ("row".equals(name)) {
-                if (isCellNull == false && record.size() != rowNull) {
-                    if (MAX_COLUMN >= record.size()) {
-                        int len = MAX_COLUMN - record.size();
-                        for (int i = 0; i < len; i++) {
-                            record.add(curCol, NULL);
-                            curCol++;
-                        }
+                if (MAX_COLUMN > record.size()) {
+                    int len = MAX_COLUMN - record.size();
+                    for (int i = 0; i < len; i++) {
+                        record.add(curCol, null);
+                        curCol++;
                     }
+                }
+                if (validRowFlag) {
                     //这里可以根据实际业务进行改造，以行为单位处理
                     rows.add(curRow, record);
-                    isCellNull = false;
-                    //这里必须新建对象，不能为了节约清空之前的对象
-                    record = new ArrayList<String>();
-                    curRow++;
-                    curCol = 0;
-                    rowNull = 0;
                 }
+                //这里必须新建对象，不能为了节约清空之前的对象
+                record = new ArrayList<String>();
+                curRow++;
+                curCol = 0;
+                rowNull = 0;
             }
         }
 
@@ -728,9 +739,14 @@ public class ExcelEventParser {
 
     public static void main(String[] args) {
         try {
+            //1、确定文件路径；2、确定表头列数
             long startTime = System.currentTimeMillis();
             // 要导入的文件地址（例：D:/新建 Microsoft Excel 工作表 .xlsx）
-            String filePath = "E:\\document\\company\\ywkj\\通宝行\\生鲜投保清单-5(无保单号).xlsx";
+            // xls
+//            String filePath = "D:\\work\\爱创\\课程体系 (3)(1).xls";
+//            List<List<String>> sheet = readerExcel(filePath, 5);
+            // xlsx
+            String filePath = "D:\\work\\通宝行\\document\\生鲜投保清单-1(无保单号).xlsx";
             List<List<String>> sheet = readerExcel(filePath, 17);
             long endTime = System.currentTimeMillis();
 //            System.out.println("总共话费时间：" + (endTime - startTime) / 1000 + "s;总条数：" + sheet.size());
