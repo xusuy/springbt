@@ -12,7 +12,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.eventusermodel.EventWorkbookBuilder.SheetRecordCollectingListener;
 import org.apache.poi.hssf.eventusermodel.FormatTrackingHSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
@@ -55,6 +54,9 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * 采用poi event事件模型读取百万级excel数据量
  * 注意：excel单元格中不能有空值，否则影响list中的对应索引值，可以使用null/NULL代替空值，list中会用""代替单元格中的null。可以补充的空单元格list中存null
+ * 提高的导入业务接口应该使用异步，在service层中异步。
+ * 异步中的限制：1、不能再异步中用RequestContextHolder获取HttpServletRequest，可以使用restTemplate，2、在异步中使用OPCPackage读取文件input流可能导致异常
+ * excel导出百万级数据可以使用：通过 POI的SXSSFWorkbook，使用操作系统的临时文件来作为缓存，可以生成超大的excel 文件
  */
 public class ExcelEventParser {
 
@@ -524,6 +526,7 @@ public class ExcelEventParser {
                 }
                 if (validRowFlag) {
                     //这里可以根据实际业务进行改造，以行为单位处理
+                    //以一条记录record为参数回调业务方法
                     rows.add(curRow, record);
                 }
                 //这里必须新建对象，不能为了节约清空之前的对象
@@ -629,6 +632,7 @@ public class ExcelEventParser {
     private static String XLS = ".xls";
     private static String XLSX = ".xlsx";
 
+    //实际使用过程中应该注入业务处理类，用来回调方法
     public ExcelEventParser() {
     }
 
@@ -746,16 +750,16 @@ public class ExcelEventParser {
 //            String filePath = "D:\\work\\爱创\\课程体系 (3)(1).xls";
 //            List<List<String>> sheet = readerExcel(filePath, 5);
             // xlsx
-            String filePath = "D:\\work\\通宝行\\document\\生鲜投保清单-1(无保单号).xlsx";
+            String filePath = "E:\\document\\company\\ywkj\\通宝行\\导入文件列表\\承保导入\\生鲜投保清单-100w.xlsx";//100w用时58s
             List<List<String>> sheet = readerExcel(filePath, 17);
             long endTime = System.currentTimeMillis();
-//            System.out.println("总共话费时间：" + (endTime - startTime) / 1000 + "s;总条数：" + sheet.size());
-            for (List<String> row : sheet) {
-                for (String cell : row) {
-                    System.out.print(cell + ",");
-                }
-                System.out.println();
-            }
+            System.out.println("总共话费时间：" + (endTime - startTime) / 1000 + "s;总条数：" + sheet.size());
+//            for (List<String> row : sheet) {
+//                for (String cell : row) {
+//                    System.out.print(cell + ",");
+//                }
+//                System.out.println();
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
