@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -54,7 +56,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * 采用poi event事件模型读取百万级excel数据量
- * 注意：excel单元格中不能有空值，否则影响list中的对应索引值，可以使用null/NULL代替空值，list中会用""代替单元格中的null。可以补充的空单元格list中存null
+ * 注意：excel2017单元格如果存在空值解析可能会直接跳过，所以使用了map存储数据
+ * 注意！！！：为了防止内存溢出，服务至少需要分配750m以上可用内存(100w数据 文件大小60m)
  */
 public class ExcelEventParser {
 
@@ -326,6 +329,12 @@ public class ExcelEventParser {
         private String NULL = "-";
         //是否是有效行
         private boolean validRowFlag = false;
+        //一行数据：存单元格值的map
+        private Map<String, String> cellMap = new HashMap<>();
+        //所有数据
+        private List<Map<String, String>> cellMapList = new ArrayList<>();
+        //单元格的位置标识，当前列字母表示：A/B/C
+        private String currentColumnLetter;
 
         /**
          * XLSXReader构造函数
@@ -366,7 +375,8 @@ public class ExcelEventParser {
                     preRef = ref;
                 }
                 ref = attributes.getValue("r");
-
+                //当前单元格的标识：A/B/C
+                currentColumnLetter = ref.substring(0, 1);
                 String r = ref;
                 int firstDigit = -1;
                 for (int c = 0; c < r.length(); ++c) {
@@ -431,26 +441,26 @@ public class ExcelEventParser {
                 }
                 String thisStr = NULL;
                 //根据当前单元格和上一个单元格判断需要补充的空单元格
-                if (null != ref && !ref.equals(Newcell)) {
-                    if (!ref.equals(preRef)) {
-                        int num = Integer.parseInt(ref.replaceAll("[A-Z]", ""));
-                        int num_1 = Integer.parseInt(preRef.replaceAll("[A-Z]", ""));
-                        int len = 0;
-                        //取出两个单元格所在行数，如果行数不同则进行换行，从A1开始填充
-                        if (num > num_1) {
-                            len = countNullCell(ref, "A1") + 1;
-                        } else {
-                            len = countNullCell(ref, preRef);
-                        }
-                        //填充空单元格
-                        for (int i = 0; i < len; i++) {
-                            record.add(curCol, null);
-                            curCol++;
-                            Newcell = ref;
-                            rowNull++;
-                        }
-                    }
-                }
+//                if (null != ref && !ref.equals(Newcell)) {
+//                    if (!ref.equals(preRef)) {
+//                        int num = Integer.parseInt(ref.replaceAll("[A-Z]", ""));
+//                        int num_1 = Integer.parseInt(preRef.replaceAll("[A-Z]", ""));
+//                        int len = 0;
+//                        //取出两个单元格所在行数，如果行数不同则进行换行，从A1开始填充
+//                        if (num > num_1) {
+//                            len = countNullCell(ref, "A1") + 1;
+//                        } else {
+//                            len = countNullCell(ref, preRef);
+//                        }
+//                        //填充空单元格
+//                        for (int i = 0; i < len; i++) {
+//                            record.add(curCol, null);
+//                            curCol++;
+//                            Newcell = ref;
+//                            rowNull++;
+//                        }
+//                    }
+//                }
                 //选择合适的方式处理单元格(null/NULL被当做空值)
                 switch (nextDataType) {
 
@@ -483,7 +493,7 @@ public class ExcelEventParser {
                             System.out.println("未找到对应的SST索引 '" + sstIndex + "': " + ex.toString());
                         }
                         if ("NULL".equalsIgnoreCase(thisStr)) {
-                            thisStr = "";
+                            thisStr = null;
                         }
                         break;
 
@@ -507,27 +517,38 @@ public class ExcelEventParser {
                         break;
                 }
                 //这里可以根据实际业务进行改造，以单元格为单位处理
-                record.add(curCol, thisStr);
-                curCol++;
+//                record.add(curCol, thisStr);
+//                curCol++;
+                cellMap.put(currentColumnLetter, thisStr);
                 if (thisStr != null || !"".equals(thisStr)) {
 //                    isCellNull = true;
                     ////如果里面某个单元格含有值，则标识该行是有效行
                     validRowFlag = true;
                 }
             } else if ("row".equals(name)) {
-                if (MAX_COLUMN > record.size()) {
-                    int len = MAX_COLUMN - record.size();
-                    for (int i = 0; i < len; i++) {
-                        record.add(curCol, null);
-                        curCol++;
+//                if (MAX_COLUMN > record.size()) {
+//                    int len = MAX_COLUMN - record.size();
+//                    for (int i = 0; i < len; i++) {
+//                        record.add(curCol, null);
+//                        curCol++;
+//                    }
+//                }
+//                if (validRowFlag) {
+//                    //这里可以根据实际业务进行改造，以行为单位处理
+//                    rows.add(curRow, record);
+//                }
+                if (validRowFlag) {
+                    cellMapList.add(cellMap);
+                    //这里可以根据实际业务进行改造，以行为单位处理
+                    if (cellMap.size() > 0) {
+                        //回调业务代码
                     }
                 }
-                if (validRowFlag) {
-                    //这里可以根据实际业务进行改造，以行为单位处理
-                    rows.add(curRow, record);
-                }
                 //这里必须新建对象，不能为了节约清空之前的对象
-                record = new ArrayList<String>();
+//                record = new ArrayList<String>();
+//                cellMap.clear();
+                cellMap = new HashMap<>();
+                currentColumnLetter = null;
                 curRow++;
                 curCol = 0;
                 rowNull = 0;
@@ -643,8 +664,8 @@ public class ExcelEventParser {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    private List<List<String>> XLSXProcessSheet(StylesTable styles, ReadOnlySharedStringsTable strings,
-                                                InputStream sheetInputStream) throws IOException, ParserConfigurationException, SAXException {
+    private List<Map<String, String>> XLSXProcessSheet(StylesTable styles, ReadOnlySharedStringsTable strings,
+                                                       InputStream sheetInputStream) throws IOException, ParserConfigurationException, SAXException {
         //将输入流包装成XML源
         InputSource sheetSource = new InputSource(sheetInputStream);
         //构造基于标签回调的XMLReader
@@ -657,7 +678,7 @@ public class ExcelEventParser {
         sheetParser.setContentHandler(handler);
         //读入XML源
         sheetParser.parse(sheetSource);
-        return handler.rows;
+        return handler.cellMapList;
     }
 
     /**
@@ -670,13 +691,13 @@ public class ExcelEventParser {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    private List<List<String>> XLSXprocess(String filePath)
+    private List<Map<String, String>> XLSXprocess(String filePath)
             throws IOException, OpenXML4JException, ParserConfigurationException, SAXException {
         //将文件以压缩包的形式读入
         OPCPackage opcPackage = OPCPackage.open(filePath, PackageAccess.READ);
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(opcPackage);
         XSSFReader xssfReader = new XSSFReader(opcPackage);
-        List<List<String>> sheet = null;
+        List<Map<String, String>> sheet = null;
         //读入样式信息
         StylesTable styles = xssfReader.getStylesTable();
         //构造sheet迭代器
@@ -711,7 +732,7 @@ public class ExcelEventParser {
     }
 
     /**
-     * 读取Excel文件内容并返回包含文件内容的List
+     * 2007 读取Excel文件内容并返回包含文件内容的List
      *
      * @param filePath 文件路径
      * @return
@@ -720,7 +741,32 @@ public class ExcelEventParser {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    public static List<List<String>> readerExcel(String filePath, int maxColumn)
+    public static List<Map<String, String>> readerXLSXExcel(String filePath, int maxColumn)
+            throws IOException, OpenXML4JException, ParserConfigurationException, SAXException {
+        MAX_COLUMN = maxColumn;
+        // 将文件数据储存起来
+        List<Map<String, String>> sheet = null;
+        // 获取文件后缀名，判断文件类型
+        int index = filePath.lastIndexOf(".");
+        String excelVer = filePath.substring(index, filePath.length());
+        ExcelEventParser csvReader = new ExcelEventParser();
+        if (XLSX.equals(excelVer)) {
+            sheet = csvReader.XLSXprocess(filePath);
+        }
+        return sheet;
+    }
+
+    /**
+     * 2003 读取Excel文件内容并返回包含文件内容的List
+     *
+     * @param filePath 文件路径
+     * @return
+     * @throws IOException
+     * @throws OpenXML4JException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
+    public static List<List<String>> readerXLSExcel(String filePath, int maxColumn)
             throws IOException, OpenXML4JException, ParserConfigurationException, SAXException {
         MAX_COLUMN = maxColumn;
         // 将文件数据储存起来
@@ -731,8 +777,6 @@ public class ExcelEventParser {
         ExcelEventParser csvReader = new ExcelEventParser();
         if (XLS.equals(excelVer)) {
             sheet = csvReader.XLSprocess(filePath);
-        } else if (XLSX.equals(excelVer)) {
-            sheet = csvReader.XLSXprocess(filePath);
         }
         return sheet;
     }
@@ -743,19 +787,24 @@ public class ExcelEventParser {
             long startTime = System.currentTimeMillis();
             // 要导入的文件地址（例：D:/新建 Microsoft Excel 工作表 .xlsx）
             // xls
-//            String filePath = "D:\\work\\爱创\\课程体系 (3)(1).xls";
-//            List<List<String>> sheet = readerExcel(filePath, 5);
-            // xlsx
-            String filePath = "D:\\work\\通宝行\\document\\生鲜投保清单-1(无保单号).xlsx";
-            List<List<String>> sheet = readerExcel(filePath, 17);
-            long endTime = System.currentTimeMillis();
-//            System.out.println("总共话费时间：" + (endTime - startTime) / 1000 + "s;总条数：" + sheet.size());
+            String filePath = "D:\\work\\爱创\\课程体系 (3)(1).xls";
+            List<List<String>> sheet = readerXLSExcel(filePath, 5);
             for (List<String> row : sheet) {
                 for (String cell : row) {
                     System.out.print(cell + ",");
                 }
                 System.out.println();
             }
+            // xlsx
+//            String filePath = "D:\\work\\通宝行\\document\\生鲜投保清单-1(无保单号).xlsx";
+//            List<Map<String, String>> sheetList = readerXLSXExcel(filePath, 17);
+//            long endTime = System.currentTimeMillis();
+////            System.out.println("总共话费时间：" + (endTime - startTime) / 1000 + "s;总条数：" + sheet.size());
+//
+//            sheetList.forEach(s -> {
+//                s.entrySet().forEach(e -> System.out.print(String.format("%s:%s;", e.getKey(), e.getValue())));
+//                System.out.println();
+//            });
         } catch (Exception e) {
             e.printStackTrace();
         }
