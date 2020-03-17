@@ -58,6 +58,9 @@ import org.xml.sax.helpers.DefaultHandler;
  * 采用poi event事件模型读取百万级excel数据量
  * 注意：excel2017单元格如果存在空值解析可能会直接跳过，所以使用了map存储数据
  * 注意！！！：为了防止内存溢出，服务至少需要分配750m以上可用内存(100w数据 文件大小60m)
+ * 提供的导入业务接口应该使用异步，在service层中异步。
+ * 异步中的限制：1、不能再异步中用RequestContextHolder获取HttpServletRequest，可以使用restTemplate，2、在异步中使用OPCPackage读取文件input流可能导致异常
+ * excel导出百万级数据可以使用：通过 POI的SXSSFWorkbook，使用操作系统的临时文件来作为缓存，可以生成超大的excel 文件
  */
 public class ExcelEventParser {
 
@@ -538,11 +541,11 @@ public class ExcelEventParser {
 //                    rows.add(curRow, record);
 //                }
                 if (validRowFlag) {
-                    cellMapList.add(cellMap);
                     //这里可以根据实际业务进行改造，以行为单位处理
                     if (cellMap.size() > 0) {
-                        //回调业务代码
+                        //以一条cellMap数据为参数回调业务方法
                     }
+                    cellMapList.add(cellMap);
                 }
                 //这里必须新建对象，不能为了节约清空之前的对象
 //                record = new ArrayList<String>();
