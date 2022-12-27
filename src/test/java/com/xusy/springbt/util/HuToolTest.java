@@ -1,0 +1,20 @@
+package com.xusy.springbt.util;
+
+import cn.hutool.core.util.NumberUtil;
+import org.junit.Test;
+
+import java.math.RoundingMode;
+
+/**
+ * @author xsy
+ * @date 2022-12-27 9:30
+ * @description hutool 工具类测试
+ */
+public class HuToolTest {
+    // 计算相关
+    @Test
+    public void calculate() {
+        double eachIntegral = NumberUtil.div(50, 5, 1, RoundingMode.UP);// 相除：取一位小数 四舍五入
+        System.out.println(eachIntegral);
+    }
+}
