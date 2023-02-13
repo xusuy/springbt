@@ -86,4 +86,17 @@ public class DateTest {
         return result;
     }
 
+    @Test
+    public void testDateAfter() throws Exception{
+        Date nowDate = new Date();
+        String ym = "2022-12-01";
+        Date ymDate = DateHelper.string2Date(ym, "yyyy-MM-dd");
+        Date afterMonth = DateUtils.addMonths(ymDate, 1);
+        System.out.println(DateUtil.format(afterMonth, "yyyy-MM-dd"));
+    }
+
+    @Test
+    public void testDateParse() {
+        String month = "2023-1";
+    }
 }
